@@ -76,8 +76,8 @@ public class XMMEnduserApi {
         let bundle = Bundle(for: XMMEnduserApi.self)
         let url = bundle.url(forResource: "XamoomSDK", withExtension: "bundle")
         var nibBundle: Bundle?
-        if let url {
-            nibBundle = Bundle(url: url)
+        if (url != nil) {
+            nibBundle = Bundle(url: url!)
         } else {
             nibBundle = bundle
         }
@@ -89,8 +89,8 @@ public class XMMEnduserApi {
         }
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
         let asciiStringData = appName.data(using: .ascii, allowLossyConversion: true)
-        if let asciiStringData {
-            appName = String(data: asciiStringData, encoding: .ascii) ?? ""
+        if asciiStringData != nil {
+            appName = String(data: asciiStringData!, encoding: .ascii) ?? ""
         }
         let customUserAgent = "\(kHTTPUserAgent)|\(appName)-\(appVersion ?? "")|\(sdkVersion ?? "")"
         return customUserAgent
