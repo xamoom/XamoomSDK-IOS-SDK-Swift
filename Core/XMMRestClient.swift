@@ -14,39 +14,39 @@ class XMMRestClient {
     var session: URLSession?
     var query: XMMQuery
     var delegate: XMMRestClientDelegate?
-    let decoder = JSONDecoder()
+    
     
     init(baseUrl: URL, session: URLSession){
         self.query = XMMQuery(url: baseUrl)
         self.session = session
     }
     
-    func fetchResource(resourceClass: XMMRestResource,
+    func fetchResource(resourceClass: AnyClass,
                        headers: [String: String],
-                       completion: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        let requestUrl = (query.urlWithResource(resourceClass: resourceClass))
+                       completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
+        let requestUrl = (query.urlWithResource(resourceClass: resourceClass as! XMMRestResource))
         return makeRestCall(url: requestUrl,
                             headers: headers,
                             complition: completion)
     }
     
-    func fetchResource(resourceClass: XMMRestResource,
+    func fetchResource(resourceClass: AnyClass,
                        headers: [String: String],
                        parameters: [String: String],
-                       completion: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        var requestUrl = (query.urlWithResource(resourceClass: resourceClass))
+                       completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
+        var requestUrl = (query.urlWithResource(resourceClass: resourceClass as! XMMRestResource))
         requestUrl = (query.addQueryParametersToUrl(url: requestUrl, parameters: parameters))
         return makeRestCall(url: requestUrl,
                             headers: headers,
                             complition: completion)
     }
     
-    func fetchResource(resourceClass: XMMRestResource,
+    func fetchResource(resourceClass: AnyClass,
                        resourceId: String,
                        headers: [String: String],
                        parameters: [String: String],
-                       completion: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
-        var requestUrl = (query.urlWithResource(resourceClass: resourceClass, resourceId: resourceId))
+                       completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
+        var requestUrl = (query.urlWithResource(resourceClass: resourceClass as! XMMRestResource, resourceId: resourceId))
         requestUrl = (query.addQueryParametersToUrl(url: requestUrl, parameters: parameters))
         return makeRestCall(url: requestUrl,
                             headers: headers,
@@ -56,7 +56,7 @@ class XMMRestClient {
     func voucherStatusWithContentID(contentId: String,
                                     clientID: String,
                                     headers: [String: String],
-                                    completion: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+                                    completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
         let resourcePath = "consumer/voucher/status"
         var requestUrl = query.baseUrl.appendingPathComponent(resourcePath)
                                       .appendingPathComponent(contentId)
@@ -73,7 +73,7 @@ class XMMRestClient {
                                     clientID: String,
                                     redeemCode: String,
                                     headers: [String: String],
-                                    completion: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+                                    completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
         let resourcePath = "consumer/voucher/redeem"
         var requestUrl = query.baseUrl.appendingPathComponent(resourcePath)
                                       .appendingPathComponent(contentId)
@@ -94,7 +94,7 @@ class XMMRestClient {
                         parameters: [String: String],
                         headers: [String: String],
                         device: XMMPushDevice,
-                        completion: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
         let requestUrl = query.urlWithResource(resourceClass: resourceClass,
                                                resourceId: resourceId)
         return postPushDevice(url: requestUrl,
@@ -106,7 +106,7 @@ class XMMRestClient {
     func postPushDevice(url: URL,
                         headers: [String: String],
                         device: XMMPushDevice,
-                        completion: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = headers
         request.httpMethod = "POST"
@@ -125,27 +125,20 @@ class XMMRestClient {
     
     func makeRestCall(url: URL,
                       headers:[String: String],
-                      complition: @escaping(Data?, URLResponse?, Error?) -> Void) -> URLSessionDataTask {
+                      complition: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
         
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = headers
         
         let task = session!.dataTask(with: request) { data, response, error in
             
-            if let error = error {
-                print("Rest call error:\(error.localizedDescription)")
-                complition(nil, nil, error)
+            guard error != nil else {
+                print("Rest call error:\(error!.localizedDescription)")
+                complition(nil, error)
                 return
             }
-            guard let data = data else {
-                return
-            }
-            do {
-                let object = try decoder.decode(<#T##type: Decodable.Protocol##Decodable.Protocol#>, from: data)
-                complition(object, nil, nil)
-            } catch (let decodingError){
-                complition(nil, nil, decodingError)
-            }
+            let data = data
+            complition(data, nil)
         }
         task.resume()
         return task

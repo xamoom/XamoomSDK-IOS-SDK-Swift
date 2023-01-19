@@ -7,18 +7,16 @@
 //
 
 import UIKit
+import XamoomSDK
 
 class ViewController: UIViewController {
+    
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        let endUserApi = XMMEnduserApi(apiKey: "25c5606b-a7bf-42e2-85c3-39db1753bc05")
+        endUserApi.contentWithId(contentId: "76856", password: nil, completion:{ content,error,passwordRequired in  })
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
 }
 

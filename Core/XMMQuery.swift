@@ -20,12 +20,14 @@ class XMMQuery {
         return baseUrl.appendingPathComponent(resourceName)
     }
     
-    func urlWithResource(resourceClass: XMMRestResource, resourceId: String) -> URL {
+    func urlWithResource(resourceClass: XMMRestResource,
+                         resourceId: String) -> URL {
         let urlWithResourceName: URL = urlWithResource(resourceClass: resourceClass)
         return urlWithResourceName.appendingPathComponent(resourceId)
     }
     
-    func addQueryParametersToUrl(url: URL, parameters:[String: String]) -> URL {
+    func addQueryParametersToUrl(url: URL,
+                                 parameters:[String: String]) -> URL {
         var parameterArray: [URLQueryItem] = []
         for key in parameters {
             let name = key.key
@@ -35,11 +37,14 @@ class XMMQuery {
         return addQueryStringToUrl(url: url, queryItems: parameterArray)
     }
     
-    func addQueryParameterToUrl(url: URL, name: String, value: String) -> URL {
+    func addQueryParameterToUrl(url: URL,
+                                name: String,
+                                value: String) -> URL {
         return addQueryParametersToUrl(url: url, parameters: [name: value])
     }
     
-    func addQueryStringToUrl(url: URL, queryItems: [URLQueryItem]) -> URL {
+    func addQueryStringToUrl(url: URL,
+                             queryItems: [URLQueryItem]) -> URL {
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
         components?.queryItems = queryItems
         let url = components?.url

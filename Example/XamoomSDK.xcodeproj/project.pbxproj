@@ -14,6 +14,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
+		75C290AD2977DA53002A7B8B /* TestingIDs.plist in Resources */ = {isa = PBXBuildFile; fileRef = 75C290AC2977DA53002A7B8B /* TestingIDs.plist */; };
 		FE3243B825F8D7276D13CF4E /* Pods_XamoomSDK_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8950B18B771A4BF7C37A5F2A /* Pods_XamoomSDK_Example.framework */; };
 /* End PBXBuildFile section */
 
@@ -41,9 +42,10 @@
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
 		74CAF7D95BABEF4367A13BF3 /* Pods-XamoomSDK_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XamoomSDK_Example.debug.xcconfig"; path = "Target Support Files/Pods-XamoomSDK_Example/Pods-XamoomSDK_Example.debug.xcconfig"; sourceTree = "<group>"; };
+		75C290AC2977DA53002A7B8B /* TestingIDs.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = TestingIDs.plist; sourceTree = "<group>"; };
 		8950B18B771A4BF7C37A5F2A /* Pods_XamoomSDK_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XamoomSDK_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCD049657FD908D8E757A300 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
-		DD6CCB432DD7E097DD4DDBD5 /* XamoomSDK.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = XamoomSDK.podspec; path = ../XamoomSDK.podspec; sourceTree = "<group>"; };
+		DD6CCB432DD7E097DD4DDBD5 /* XamoomSDK.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = XamoomSDK.podspec; path = ../XamoomSDK.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		E4E657D9B93DE0662BEC4541 /* Pods_XamoomSDK_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_XamoomSDK_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E5E7607B20772C300CCD2562 /* Pods-XamoomSDK_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XamoomSDK_Example.release.xcconfig"; path = "Target Support Files/Pods-XamoomSDK_Example/Pods-XamoomSDK_Example.release.xcconfig"; sourceTree = "<group>"; };
 		F1B58076B641E15F14384736 /* Pods-XamoomSDK_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-XamoomSDK_Tests.debug.xcconfig"; path = "Target Support Files/Pods-XamoomSDK_Tests/Pods-XamoomSDK_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -119,6 +121,7 @@
 			isa = PBXGroup;
 			children = (
 				607FACD41AFB9204008FA782 /* Info.plist */,
+				75C290AC2977DA53002A7B8B /* TestingIDs.plist */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -246,6 +249,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				75C290AD2977DA53002A7B8B /* TestingIDs.plist in Resources */,
 				607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */,
 				607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */,
 				607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */,

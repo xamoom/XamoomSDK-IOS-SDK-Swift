@@ -7,7 +7,7 @@
 
 import Foundation
 
-class XMMContent: XMMRestResource{
+public class XMMContent: XMMRestResource{
     
     var resourceName: String {
         return "consumer/contents"
