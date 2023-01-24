@@ -7,14 +7,9 @@
 
 import Foundation
 
-class XMMPushDevice: XMMRestResource {
-    var resourceName: String {
+public struct XMMPushDevice: XMMRestResource, Codable {
+    
+    static var resourceName: String {
         return "customer/push-register"
-    }
-    var model: AnyObject {
-        return PushDevice() as AnyObject
-    }
-    struct PushDevice: Codable {
-        
     }
 }

@@ -7,19 +7,9 @@
 
 import Foundation
 
-class XMMContentBlock: XMMRestResource {
+public struct XMMContentBlock: XMMRestResource, Codable {
     
-    var resourceName: String {
+   static var resourceName: String {
         return "contentblocks"
     }
-    
-    var model: AnyObject {
-        return ContentBlock() as AnyObject
-    }
-    
-    struct ContentBlock: Codable {
-        
-    }
-    
-    
 }

@@ -8,7 +8,5 @@
 import Foundation
 
 protocol XMMRestResource {
-    var resourceName: String { get }
-    
-    var model: AnyObject { get }
+    static var resourceName: String { get }
 }

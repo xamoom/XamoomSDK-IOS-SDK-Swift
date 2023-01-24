@@ -7,17 +7,12 @@
 
 import Foundation
 
-public class XMMContent: XMMRestResource{
+public struct XMMContent: XMMRestResource, Codable {
     
-    var resourceName: String {
+   static var resourceName: String {
         return "consumer/contents"
     }
-    var model: AnyObject {
-        return Content() as AnyObject
-    }
-    struct Content: Codable {
-        
-    }
+   
     
     
 }

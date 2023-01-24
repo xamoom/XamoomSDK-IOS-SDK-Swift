@@ -7,16 +7,9 @@
 
 import Foundation
 
-class XMMSpot: XMMRestResource {
-    var resourceName: String {
+public struct XMMSpot: XMMRestResource, Codable {
+    
+   static var resourceName: String {
         return "consumer/spots"
     }
-    var model: AnyObject {
-        return Spot() as AnyObject
-    }
-    struct Spot: Codable {
-        
-    }
-    
-    
 }

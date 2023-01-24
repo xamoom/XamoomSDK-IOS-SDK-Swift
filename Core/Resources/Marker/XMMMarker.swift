@@ -7,14 +7,9 @@
 
 import Foundation
 
-class XMMMarker: XMMRestResource {
-    var resourceName: String {
+public struct XMMMarker: XMMRestResource, Codable {
+    
+    static var resourceName: String {
         return "markers"
-    }
-    var model: AnyObject {
-        return Marker() as AnyObject
-    }
-    struct Marker: Codable {
-        
     }
 }

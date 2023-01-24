@@ -11,12 +11,34 @@ import XamoomSDK
 
 class ViewController: UIViewController {
     
+    var api: XMMEnduserApi?
+        
     
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        let endUserApi = XMMEnduserApi(apiKey: "25c5606b-a7bf-42e2-85c3-39db1753bc05")
-        endUserApi.contentWithId(contentId: "76856", password: nil, completion:{ content,error,passwordRequired in  })
+        api = XMMEnduserApi(apiKey: getApiKey())
+        contentWithID()
+    }
+    
+    private func contentWithID() {
+        api!.contentWithId(contentId: "709", password: nil, completion: { XMMContent, error, passwordRequired in
+        })
+    }
+    
+    func getApiKey() -> String {
+        var config: [String: Any]?
+        if let infopListPath = Bundle.main.url(forResource: "TestingIDs", withExtension: "plist") {
+            do {
+                let infoPlistData = try Data(contentsOf: infopListPath)
+                if let dict = try PropertyListSerialization.propertyList(from: infoPlistData, format: nil) as? [String: Any] {
+                    config = dict
+                }
+            } catch {
+                print(error)
+            }
+        }
+        let apiKey = config!["APIKEY"] as! String
+        return apiKey
     }
 }
 

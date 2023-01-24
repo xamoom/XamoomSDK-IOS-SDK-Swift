@@ -7,15 +7,10 @@
 
 import Foundation
 
-class XMMMenu: XMMRestResource{
-    var resourceName: String {
+public struct XMMMenu: XMMRestResource, Codable {
+    
+    static var resourceName: String {
         return "consumer/menus"
-    }
-    var model: AnyObject {
-        return Menu() as AnyObject
-    }
-    struct Menu: Codable {
-        
     }
     
 }

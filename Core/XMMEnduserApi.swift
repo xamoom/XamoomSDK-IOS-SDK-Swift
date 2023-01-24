@@ -89,6 +89,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                              completion: completion)
     }
     
+    
     public func contentWithId(contentId: String,
                        options: XMMContentOptions,
                        password: String?,
@@ -99,6 +100,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                              password: password,
                              completion: completion)
     }
+    
     
     public func contentWithId(contentId: String,
                        options: XMMContentOptions,
@@ -128,10 +130,9 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                                         headers: headers,
                                         parameters: params,
                                         completion: { data, error in
-            
         })
-        
     }
+    
     
     
     
@@ -188,7 +189,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             return ephemeralId!
         }
         ephemeralId = getUserDefaults().string(forKey: kEphemeralIdKey)
-        return ephemeralId!
+        return ephemeralId ?? ""
     }
     
     private func getAuthorizationId() -> String {
@@ -196,11 +197,11 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             return authorizationId!
         }
         authorizationId = getUserDefaults().string(forKey: kAuthorizationKey)
-        return authorizationId!
+        return authorizationId ?? ""
     }
     
     private func getUserDefaults() -> UserDefaults {
-        if userDefaults != nil {
+        if userDefaults == nil {
             userDefaults = UserDefaults.standard
         }
         return userDefaults!
@@ -217,17 +218,11 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     func customUserAgentFrom(appName: String) -> String {
         var appName = appName
-        let bundle = Bundle(for: XMMEnduserApi.self)
-        let url = bundle.url(forResource: "XamoomSDK", withExtension: "bundle")
-        var nibBundle: Bundle?
-        if (url != nil) {
-            nibBundle = Bundle(url: url!)
-        } else {
-            nibBundle = bundle
-        }
-        let infoDict = nibBundle?.infoDictionary
-        let sdkVersion = infoDict?["CFBundleShortVersionString"] as? String
         
+
+        let infoDict = Bundle.main.infoDictionary
+        let sdkVersion = infoDict?["CFBundleShortVersionString"] as? String
+
         if appName.count == 0 {
             appName = Bundle.main.bundleIdentifier ?? ""
         }

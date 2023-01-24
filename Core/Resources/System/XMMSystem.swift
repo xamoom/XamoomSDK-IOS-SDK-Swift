@@ -6,14 +6,10 @@
 //
 
 import Foundation
-class XMMSystem: XMMRestResource {
-    var resourceName: String {
+
+public struct XMMSystem: XMMRestResource, Codable {
+    
+    static var resourceName: String {
         return "consumer/systems"
-    }
-    var model: AnyObject {
-        return System() as AnyObject
-    }
-    struct System: Codable {
-        
     }
 }

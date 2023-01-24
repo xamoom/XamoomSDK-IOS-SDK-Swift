@@ -15,12 +15,31 @@ class XMMQuery {
         self.baseUrl = url
     }
     
-    func urlWithResource(resourceClass: XMMRestResource) -> URL {
-        let resourceName = resourceClass.resourceName
+    func urlWithResource(resourceClass: Any) -> URL {
+        var resourceName: String = ""
+        switch resourceClass{
+        case is XMMContentBlock.Type:
+            resourceName = XMMContentBlock.resourceName
+        case is XMMContent.Type:
+            resourceName = XMMContent.resourceName
+        case is XMMSystem.Type:
+            resourceName = XMMSystem.resourceName
+        case is XMMMenu.Type:
+            resourceName = XMMMenu.resourceName
+        case is XMMPushDevice.Type:
+            resourceName = XMMPushDevice.resourceName
+        case is XMMMarker.Type:
+            resourceName = XMMMarker.resourceName
+        case is XMMSpot.Type:
+            resourceName = XMMSpot.resourceName
+        default:
+            print("Can finde resource url")
+            break
+        }
         return baseUrl.appendingPathComponent(resourceName)
     }
     
-    func urlWithResource(resourceClass: XMMRestResource,
+    func urlWithResource(resourceClass: Any,
                          resourceId: String) -> URL {
         let urlWithResourceName: URL = urlWithResource(resourceClass: resourceClass)
         return urlWithResourceName.appendingPathComponent(resourceId)

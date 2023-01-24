@@ -9,7 +9,7 @@ import Foundation
 
 class XMMRestClient {
     
-    let EPHEMERAL_ID_HEADER = "X-Ephemeral-Id"
+    let EPHEMERAL_ID_HEADER = "x-ephemeral-id"
     let AUTHORIZATION_ID_HEADER = "Authorization"
     var session: URLSession?
     var query: XMMQuery
@@ -21,32 +21,32 @@ class XMMRestClient {
         self.session = session
     }
     
-    func fetchResource(resourceClass: AnyClass,
+    func fetchResource(resourceClass: Any,
                        headers: [String: String],
                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
-        let requestUrl = (query.urlWithResource(resourceClass: resourceClass as! XMMRestResource))
+        let requestUrl = (query.urlWithResource(resourceClass: resourceClass))
         return makeRestCall(url: requestUrl,
                             headers: headers,
                             complition: completion)
     }
     
-    func fetchResource(resourceClass: AnyClass,
+    func fetchResource(resourceClass: Any,
                        headers: [String: String],
                        parameters: [String: String],
                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
-        var requestUrl = (query.urlWithResource(resourceClass: resourceClass as! XMMRestResource))
+        var requestUrl = (query.urlWithResource(resourceClass: resourceClass))
         requestUrl = (query.addQueryParametersToUrl(url: requestUrl, parameters: parameters))
         return makeRestCall(url: requestUrl,
                             headers: headers,
                             complition: completion)
     }
     
-    func fetchResource(resourceClass: AnyClass,
+    func fetchResource(resourceClass: Any,
                        resourceId: String,
                        headers: [String: String],
                        parameters: [String: String],
                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
-        var requestUrl = (query.urlWithResource(resourceClass: resourceClass as! XMMRestResource, resourceId: resourceId))
+        var requestUrl = (query.urlWithResource(resourceClass: resourceClass, resourceId: resourceId))
         requestUrl = (query.addQueryParametersToUrl(url: requestUrl, parameters: parameters))
         return makeRestCall(url: requestUrl,
                             headers: headers,
@@ -89,7 +89,7 @@ class XMMRestClient {
                             complition: completion)
     }
     
-    func postPushDevice(resourceClass: XMMRestResource,
+    func postPushDevice(resourceClass: Any,
                         resourceId: String,
                         parameters: [String: String],
                         headers: [String: String],
@@ -130,26 +130,29 @@ class XMMRestClient {
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = headers
         
-        let task = session!.dataTask(with: request) { data, response, error in
+        let task = session!.dataTask(with: request) { (data, response, error) in
             
-            guard error != nil else {
-                print("Rest call error:\(error!.localizedDescription)")
+            if let error = error {
+                print("Make rest call method error:\(error.localizedDescription)")
                 complition(nil, error)
-                return
+            } else if let data = data,
+                      let response = response as? HTTPURLResponse,
+                      response.statusCode == 200 {
+                
+                self.checkHeaders(headers: response)
+                complition(data, nil)
             }
-            let data = data
-            complition(data, nil)
         }
         task.resume()
         return task
     }
     
-    func checkHeaders(headers: [String: String]) {
-        let ephemeralId = headers[EPHEMERAL_ID_HEADER]
+    func checkHeaders(headers: URLResponse) {
+        let ephemeralId = headers.headerField(forKey: EPHEMERAL_ID_HEADER)
         if ephemeralId != nil && delegate != nil {
             delegate!.gotEphemeralId(ephemeralId: ephemeralId)
         }
-        let authorizationId = headers[AUTHORIZATION_ID_HEADER]
+        let authorizationId = headers.headerField(forKey: AUTHORIZATION_ID_HEADER)
         if authorizationId != nil && delegate != nil {
             delegate!.gotAuthorizationId(authorizationId: authorizationId)
         }
