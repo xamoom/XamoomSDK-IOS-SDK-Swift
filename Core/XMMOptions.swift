@@ -16,7 +16,6 @@ public struct XMMContentOptions: OptionSet {
         self.rawValue = rawValue
     }
     
-    
     /// No options.
    public static let XMMContentOptionsNone = Self(rawValue: 0 << 0)
     /// Will not save statistics.
@@ -28,8 +27,11 @@ public struct XMMContentOptions: OptionSet {
 /**
  * XMMSpot special options.
  */
-struct XMMSpotOptions: OptionSet {
-    let rawValue: Int
+public struct XMMSpotOptions: OptionSet {
+   public let rawValue: Int
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
     
     /// No options.
     static let XMMSpotOptionsNone = Self(rawValue: 0 << 0)
@@ -44,9 +46,11 @@ struct XMMSpotOptions: OptionSet {
 /**
  * XMMContent sorting options.
  */
-struct XMMContentSortOptions: OptionSet {
-    let rawValue: Int
-    
+public struct XMMContentSortOptions: OptionSet {
+    public let rawValue: Int
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
     /// No sorting.
     static let XMMContentSortOptionsNone = Self(rawValue: 0 << 0)
     /// Sort by name ascending.
@@ -66,8 +70,11 @@ struct XMMContentSortOptions: OptionSet {
 /**
  * XMMSpot sorting options.
  */
-struct XMMSpotSortOptions: OptionSet {
-    let rawValue: Int
+public struct XMMSpotSortOptions: OptionSet {
+    public let rawValue: Int
+    public init(rawValue: Int) {
+        self.rawValue = rawValue
+    }
     
     /// No sorting.
     static let XMMSpotSortOptionsNone = Self(rawValue: 0 << 0)

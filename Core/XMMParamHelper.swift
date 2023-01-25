@@ -64,8 +64,8 @@ class XMMParamHelper {
         if filters.toDate != nil {
             mutableParams["filter[meta-datetime-to]"] =  filters.toDate!.ISO8601()
         }
-        if filters.relatedSpot != nil {
-            mutableParams["filter[related-spot]"] = filters.relatedSpot!
+        if filters.relatedSpotID != nil {
+            mutableParams["filter[related-spot]"] = filters.relatedSpotID!
         }
         if filters.name != nil {
             mutableParams["filter[name]"] = filters.name

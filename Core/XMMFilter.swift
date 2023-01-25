@@ -12,30 +12,30 @@ class XMMFilterBuilder {
     var tags: [String]?
     var fromDate: Date?
     var toDate: Date?
-    var relatedSpot: String?
+    var relatedSpotID: String?
     
     init(){
         name = nil
         tags = nil
         fromDate = nil
         toDate = nil
-        relatedSpot = nil
+        relatedSpotID = nil
     }
 }
 
-class XMMFilter {
+public class XMMFilter {
     private(set) var name: String?
     private(set) var tags: [String]?
     private(set) var fromDate: Date?
     private(set) var toDate: Date?
-    private(set) var relatedSpot: String?
+    private(set) var relatedSpotID: String?
     
     init(builder: XMMFilterBuilder) {
         name = builder.name
         tags = builder.tags
         fromDate = builder.fromDate
         toDate = builder.toDate
-        relatedSpot = builder.relatedSpot
+        relatedSpotID = builder.relatedSpotID
     }
     
     convenience init() {

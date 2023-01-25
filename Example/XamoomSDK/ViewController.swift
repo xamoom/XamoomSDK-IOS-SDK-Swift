@@ -17,11 +17,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         api = XMMEnduserApi(apiKey: getApiKey())
-        contentWithID()
+//        contentWithID()
+        contentWithLocationIdentifier()
     }
     
     private func contentWithID() {
-        api!.contentWithId(contentId: "709", password: nil, completion: { XMMContent, error, passwordRequired in
+        api!.contentWithId(contentId: "709", password: nil, completion: { (XMMContent, error, passwordRequired) in
+        })
+    }
+    
+    private func contentWithLocationIdentifier() {
+        api?.contentWithLocationIdentifier(locationIdentifier: "b5v2p", options: XMMContentOptions.init(rawValue: 0), password: nil, completion: { (XMMContent, error, passwordRequired) in
+            
         })
     }
     
