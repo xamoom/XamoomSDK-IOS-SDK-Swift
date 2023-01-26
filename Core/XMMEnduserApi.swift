@@ -601,6 +601,141 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         })
     }
     
+    // MARK: - SYSTEM CALLS
+    // MARK: - system with completion
+    
+    public func systemWithCompletion(completion: @escaping(_ system: XMMSystem?, _ error: Error) -> Void) -> URLSessionDataTask {
+        
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        
+        return self.restClient.fetchResource(resourceClass: XMMSystem.self,
+                                             headers: self.httpHeadersWithEphemeralId(),
+                                             parameters: params,
+                                             completion: { (data, error) in
+            
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            if let data = data {
+                print("System with completion succes")
+            }
+        })
+    }
+    
+    // MARK: - system settings with id
+    
+    public func systemSettingsWithID(settingsId: String,
+                                     completion: @escaping(_ settings: XMMSystemSettings?, _ error: Error) -> Void) -> URLSessionDataTask {
+        
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        
+        return self.restClient.fetchResource(resourceClass: XMMSystemSettings.self,
+                                             resourceId: settingsId,
+                                             headers: self.httpHeadersWithEphemeralId(),
+                                             parameters: params,
+                                             completion: { (data, error) in
+            
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            if let data = data {
+                print("System settings with completion succes")
+            }
+        })
+    }
+    
+    // MARK: - style with id
+    
+    public func styleWithID(styleId: String,
+                            completion: @escaping(_ style: XMMStyle?, _ error: Error) -> Void) -> URLSessionDataTask {
+        
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        
+        return self.restClient.fetchResource(resourceClass: XMMStyle.self,
+                                             resourceId: styleId,
+                                             headers: self.httpHeadersWithEphemeralId(),
+                                             parameters: params,
+                                             completion: { (data, error) in
+            
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            if let data = data {
+                print("System settings with completion succes")
+            }
+        })
+    }
+    
+    // MARK: - menu with id
+    
+    public func menuWithID(menuId: String,
+                            completion: @escaping(_ menu: XMMMenu?, _ error: Error) -> Void) -> URLSessionDataTask {
+        
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        
+        return self.restClient.fetchResource(resourceClass: XMMMenu.self,
+                                             resourceId: menuId,
+                                             headers: self.httpHeadersWithEphemeralId(),
+                                             parameters: params,
+                                             completion: { (data, error) in
+            
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            if let data = data {
+                print("System settings with completion succes")
+            }
+        })
+    }
+    
+    // MARK: - voucher status with id
+    
+    public func voucherStatusWithContendID(contentId: String,
+                                           clientId: String?, completion: @escaping(_ isRedeemable: Bool?, _ error: Error) -> Void) -> URLSessionDataTask {
+        
+        return self.restClient.voucherStatusWithContentID(contentId: contentId,
+                                                          clientID: clientId ?? self.getEphemeralId(),
+                                                          headers: self.httpHeadersWithEphemeralId(),
+                                                          completion: { (data, error) in
+            
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            if let data = data{
+                print("Voucher status succes")
+            }
+        })
+    }
+    
+    // MARK: - redeem voucher with id
+    
+    public func redeemVoucherWithContendID(contentId: String,
+                                           clientId: String?,
+                                           readeemCode: String,
+                                           completion: @escaping(_ isRedeemable: Bool?, _ error: Error) -> Void) -> URLSessionDataTask {
+        
+        return self.restClient.redeemVoucherWithContentID(contentId: contentId,
+                                                          clientID: clientId ?? self.getEphemeralId(),
+                                                          redeemCode: readeemCode,
+                                                          headers: self.httpHeadersWithEphemeralId(),
+                                                          completion: { (data, error) in
+            
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            if let data = data{
+                print("Redeem voucher status succes")
+            }
+        })
+    }
+    
+    // MARK: - push device
     
     
     
@@ -656,20 +791,20 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         return headers
     }
     
-    private func getEphemeralId() -> String? {
+    private func getEphemeralId() -> String {
         if self.ephemeralId != nil {
             return self.ephemeralId!
         }
         self.ephemeralId = getUserDefaults().string(forKey: kEphemeralIdKey)
-        return self.ephemeralId ?? nil
+        return self.ephemeralId ?? ""
     }
     
-    private func getAuthorizationId() -> String? {
+    private func getAuthorizationId() -> String {
         if self.authorizationId != nil {
             return self.authorizationId!
         }
         self.authorizationId = getUserDefaults().string(forKey: kAuthorizationKey)
-        return self.authorizationId ?? nil
+        return self.authorizationId ?? ""
     }
     
     private func getUserDefaults() -> UserDefaults {

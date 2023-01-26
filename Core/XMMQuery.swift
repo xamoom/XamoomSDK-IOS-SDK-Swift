@@ -24,6 +24,10 @@ class XMMQuery {
             resourceName = XMMContent.resourceName
         case is XMMSystem.Type:
             resourceName = XMMSystem.resourceName
+        case is XMMSystemSettings.Type:
+            resourceName = XMMSystemSettings.resourceName
+        case is XMMStyle.Type:
+            resourceName = XMMStyle.resourceName
         case is XMMMenu.Type:
             resourceName = XMMMenu.resourceName
         case is XMMPushDevice.Type:
