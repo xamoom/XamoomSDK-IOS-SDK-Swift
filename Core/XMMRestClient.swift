@@ -91,10 +91,10 @@ class XMMRestClient {
     
     func postPushDevice(resourceClass: Any,
                         resourceId: String,
-                        parameters: [String: String],
+                        parameters: [String: String]?,
                         headers: [String: String],
-                        device: XMMPushDevice,
-                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
+                        device: XMMPushDevice.XMMPushDeviceObject,
+                        completion: @escaping(URLResponse, Error?) -> Void) -> URLSessionDataTask {
         let requestUrl = query.urlWithResource(resourceClass: resourceClass,
                                                resourceId: resourceId)
         return postPushDevice(url: requestUrl,
@@ -105,13 +105,20 @@ class XMMRestClient {
     
     func postPushDevice(url: URL,
                         headers: [String: String],
-                        device: XMMPushDevice,
-                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
+                        device: XMMPushDevice.XMMPushDeviceObject,
+                        completion: @escaping(URLResponse, Error?) -> Void) -> URLSessionDataTask {
         var request = URLRequest(url: url)
         request.allHTTPHeaderFields = headers
         request.httpMethod = "POST"
         
-        let body = "NEED SET BODY"
+        let encoder = JSONEncoder()
+        
+        do {
+            let body = try encoder.encode(device)
+            request.httpBody = body
+        } catch {
+            print("Devices encode error: \(error.localizedDescription)")
+        }
         
         let task = session!.dataTask(with: request) { data, response, error in
             

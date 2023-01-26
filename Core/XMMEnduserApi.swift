@@ -4,16 +4,7 @@
 //
 //  Created by Vladislav Cherednichenko on 10.01.2023.
 //
-/**
- * `XMMEnduserApi` is the main part of the XamoomSDK. You can use it to send api request to the xamoom-api.
- *
- * Use initWithApiKey: to initialize.
- *
- * Change the requested language by setting the language. The users language is
- * saved in systemLanguage.
- *
- * Set offline to true, to get results from offline storage.
- */
+
 
 import Foundation
 import CoreLocation
@@ -36,39 +27,39 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     var ephemeralId: String?
     var authorizationId: String?
-    var systemLanguage: String!
-    var language: String!
-    var restClient: XMMRestClient!
+    var systemLanguage: String?
+    var language: String?
+    var restClient: XMMRestClient?
     var userDefaults: UserDefaults?
-    var pushSound = false
-    var noNotification = false
+    var pushSound: Bool?
+    var noNotification: Bool?
     var lastLocation: CLLocation?
+    var apiUrl: String?
     
     // MARK: - init
     
    public convenience init(apiKey: String) {
-        self .init(apiKey: apiKey, isProduction: true)
+       self.init(apiKey:apiKey, isProduction: true)
     }
     
     init(apiKey: String, isProduction: Bool) {
-        systemLanguage = systemLanguageWithoutRegionCode()
+        self.systemLanguage = systemLanguageWithoutRegionCode()
         language = systemLanguage
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = ["Content-Type": kHTTPContentType,
                                         "User-Agent": customUserAgentFrom(appName: ""),
                                         "APIKEY": apiKey]
-        var apiUrl = ""
-        if isProduction {
-            apiUrl = kApiProdURLString
-        } else {
-            apiUrl = kApiDevBaseURLString
-        }
-        restClient = XMMRestClient(baseUrl: URL(string: apiUrl)!, session: URLSession(configuration: config))
         
-        restClient.delegate.self
-        pushSound = true
-        noNotification = false
-        lastLocation = CLLocation.init(latitude: 0.0, longitude: 0.0)
+        if isProduction {
+            self.apiUrl = kApiProdURLString
+        } else {
+            self.apiUrl = kApiDevBaseURLString
+        }
+        self.restClient = XMMRestClient(baseUrl: URL(string: self.apiUrl!)!, session: URLSession(configuration: config))
+        
+        self.pushSound = true
+        self.noNotification = false
+        self.lastLocation = CLLocation.init(latitude: 0.0, longitude: 0.0)
     }
     
     func systemLanguageWithoutRegionCode() -> String {
@@ -126,9 +117,8 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             userDefaults.synchronize()
             userDefaults.set(password, forKey: "X-Password")
         }
-        let userDefaults = getUserDefaults()
         
-        return self.restClient.fetchResource(resourceClass: XMMContent.self,
+        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                         resourceId: contentId,
                                         headers: headers,
                                         parameters: params,
@@ -191,7 +181,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         let dateTime = calendar.date(from: components)
         mutableConditions["x-datetime"] = [dateTime]
         
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language, identifier: locationIdentifier)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!, identifier: locationIdentifier)
         params = XMMParamHelper.addContentOptionsToParams(params: params, options: options)
         params = XMMParamHelper.addConditionsToParams(params: params, conditions: conditions ?? [:])
         
@@ -205,7 +195,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             userDefault.synchronize()
             headers["X-Password"] = password
         }
-        return self.restClient.fetchResource(resourceClass: XMMContent.self,
+        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: headers,
                                              parameters: params,
                                              completion: { (data, error) in
@@ -277,11 +267,11 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                                      cursor: String,
                                      sortOptions: XMMContentSortOptions,
                                      completion: @escaping(_ contents: [Any], _ hasMore: Bool, _ cursor: String, _ error: Error) -> Void) -> URLSessionDataTask {
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language, location: location)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!, location: location)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addContentSortOptionsToParams(params: params, options: sortOptions)
         
-        return self.restClient.fetchResource(resourceClass: XMMContent.self,
+        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -320,12 +310,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             builder.toDate = filter?.toDate
             builder.relatedSpotID = filter?.relatedSpotID
         })
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addFiltersToParams(params: params, filters: filter)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addContentSortOptionsToParams(params: params, options: sortOptions)
         
-        return self.restClient.fetchResource(resourceClass: XMMContent.self,
+        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -363,12 +353,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             builder.toDate = filter?.toDate
             builder.relatedSpotID = filter?.relatedSpotID
         })
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addFiltersToParams(params: params, filters: filters)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addContentSortOptionsToParams(params: params, options: sortOptions)
         
-        return self.restClient.fetchResource(resourceClass: XMMContent.self,
+        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -389,12 +379,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             builder.toDate = toDate
             builder.relatedSpotID = relatedSpotID
         })
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addFiltersToParams(params: params, filters: filters)
         params = XMMParamHelper.addContentSortOptionsToParams(params: params, options: sortOption)
         
-        return self.restClient.fetchResource(resourceClass: XMMContent.self,
+        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -412,7 +402,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     public func contentRecommendationsWithCompletion(completion: @escaping( _ contents: [Any]?, _ hasMore: Bool, _ cursor: String?, _ error: NSError?) -> Void) -> URLSessionDataTask? {
         
-        if self.getEphemeralId() == nil {
+        if self.getEphemeralId() == "" {
             print("Content Recommendations not available without ephemeral id, please first call backend another way.")
             completion(nil, false, nil, NSError(domain: "com.xamoom",
                                                 code: 0,
@@ -421,7 +411,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             return nil
         }
         
-        if self.getAuthorizationId() == nil {
+        if self.getAuthorizationId() == "" {
             print("Content Recommendations not available without authorization id, please first call backend another way.")
             completion(nil, false, nil, NSError(domain: "com.xamoom",
                                                 code: 0,
@@ -429,12 +419,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             
             return nil
         }
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addRecommendationsToParams(params: params)
         
         let headers = self.httpHeadersWithEphemeralId()
         
-        return self.restClient.fetchResource(resourceClass: XMMContent.self,
+        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: headers,
                                              parameters: params,
                                              completion: { (data, error) in
@@ -461,10 +451,10 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     public func spotWithId(spotId: String,
                            options: XMMSpotOptions,
                            completion: @escaping( _ spot: XMMSpot?, _ error: Error?) -> Void) -> URLSessionDataTask {
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addSpotOptionsToParams(params: params, options: options)
         
-        return self.restClient.fetchResource(resourceClass: XMMSpot.self,
+        return self.restClient!.fetchResource(resourceClass: XMMSpot.self,
                                              resourceId: spotId,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
@@ -504,12 +494,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                                  pageSize: Int,
                                  cursor: String?,
                                  completion: @escaping( _ spot: [Any]?, _ hasMore: Bool, _ cursor: String?, _ error: Error) -> Void) -> URLSessionDataTask {
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language, location: location, radius: radius)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!, location: location, radius: radius)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addSpotOptionsToParams(params: params, options: options)
         params = XMMParamHelper.addSpotSortOptionsToParams(params: params, options: sortOptions)
         
-        return self.restClient.fetchResource(resourceClass: XMMSpot.self,
+        return self.restClient!.fetchResource(resourceClass: XMMSpot.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -548,13 +538,13 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         let filters = XMMFilter.makeWithBuilder(updateBlock: { builder in
             builder.tags = tags
         })
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addFiltersToParams(params: params, filters: filters)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addSpotOptionsToParams(params: params, options: options)
         params = XMMParamHelper.addSpotSortOptionsToParams(params: params, options: sortOptions)
         
-        return self.restClient.fetchResource(resourceClass: XMMSpot.self,
+        return self.restClient!.fetchResource(resourceClass: XMMSpot.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -581,13 +571,13 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         let filters = XMMFilter.makeWithBuilder(updateBlock: { builder in
             builder.name = name
         })
-        var params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addFiltersToParams(params: params, filters: filters)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addSpotOptionsToParams(params: params, options: options)
         params = XMMParamHelper.addSpotSortOptionsToParams(params: params, options: sortOptions)
         
-        return self.restClient.fetchResource(resourceClass: XMMSpot.self,
+        return self.restClient!.fetchResource(resourceClass: XMMSpot.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -606,9 +596,9 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     public func systemWithCompletion(completion: @escaping(_ system: XMMSystem?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         
-        return self.restClient.fetchResource(resourceClass: XMMSystem.self,
+        return self.restClient!.fetchResource(resourceClass: XMMSystem.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -628,9 +618,9 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     public func systemSettingsWithID(settingsId: String,
                                      completion: @escaping(_ settings: XMMSystemSettings?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         
-        return self.restClient.fetchResource(resourceClass: XMMSystemSettings.self,
+        return self.restClient!.fetchResource(resourceClass: XMMSystemSettings.self,
                                              resourceId: settingsId,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
@@ -651,9 +641,9 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     public func styleWithID(styleId: String,
                             completion: @escaping(_ style: XMMStyle?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         
-        return self.restClient.fetchResource(resourceClass: XMMStyle.self,
+        return self.restClient!.fetchResource(resourceClass: XMMStyle.self,
                                              resourceId: styleId,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
@@ -674,9 +664,9 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     public func menuWithID(menuId: String,
                             completion: @escaping(_ menu: XMMMenu?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        let params = XMMParamHelper.paramsWithLanguage(language: self.language)
+        let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         
-        return self.restClient.fetchResource(resourceClass: XMMMenu.self,
+        return self.restClient!.fetchResource(resourceClass: XMMMenu.self,
                                              resourceId: menuId,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
@@ -697,7 +687,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     public func voucherStatusWithContendID(contentId: String,
                                            clientId: String?, completion: @escaping(_ isRedeemable: Bool?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        return self.restClient.voucherStatusWithContentID(contentId: contentId,
+        return self.restClient!.voucherStatusWithContentID(contentId: contentId,
                                                           clientID: clientId ?? self.getEphemeralId(),
                                                           headers: self.httpHeadersWithEphemeralId(),
                                                           completion: { (data, error) in
@@ -719,7 +709,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                                            readeemCode: String,
                                            completion: @escaping(_ isRedeemable: Bool?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        return self.restClient.redeemVoucherWithContentID(contentId: contentId,
+        return self.restClient!.redeemVoucherWithContentID(contentId: contentId,
                                                           clientID: clientId ?? self.getEphemeralId(),
                                                           redeemCode: readeemCode,
                                                           headers: self.httpHeadersWithEphemeralId(),
@@ -737,9 +727,73 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - push device
     
-    public func pushDevice(instantPush: Bool) -> URLSessionDataTask {
+    public func pushDevice(instantPush: Bool) -> URLSessionDataTask? {
+        let storage = XMMSimpleStorage()
+        let userDefault = self.getUserDefaults()
         
-        let lastPush = self.getUserDefaults().double(forKey: self.kLastPushRegisterKey)
+        let lastPush = userDefault.double(forKey: self.kLastPushRegisterKey)
+        var location = storage.getLocation()
+        
+        if location == nil {
+            location = CLLocation(latitude: 0.0, longitude: 0.0)
+        }
+        
+        // Checks if new location distance less than 100 meters. If true do nothing.
+        if !instantPush && self.lastLocation!.distance(from: location!) < 100 {
+            return nil
+        }
+        if !instantPush && lastPush != 0.0 && lastPush > Date().timeIntervalSince1970 - 30.0 * 60.0 {
+            return nil
+        }
+        
+        let token = storage.getUserToken()
+        let infoDictionary = Bundle.main.infoDictionary
+        let version = infoDictionary?["CFBundleShortVersionString"] as? String
+        let appId = infoDictionary?["CFBundleIdentifier"] as? String
+        let sdkVersion = "3.11.20"
+        
+        if token != nil && version != nil && appId != nil {
+            
+            let locationDictionary = ["lat": Double(location!.coordinate.latitude),
+                                      "lon": Double(location!.coordinate.longitude)]
+            
+            let pushLog = self.pushSound! ? "Push Device sound: YES" : "Push Device sound: No"
+            print(pushLog)
+            
+            let notificationLog = self.noNotification! ? "Disabled push" : "Enabled push"
+            print(notificationLog)
+            
+            self.lastLocation = location!
+            
+            let now = Date().timeIntervalSince1970
+            userDefault.set(now, forKey: kLastPushRegisterKey)
+            userDefault.synchronize()
+            
+            let device = XMMPushDevice.XMMPushDeviceObject(uid: token,
+                                                           os: nil,
+                                                           appVersion: version,
+                                                           appId: appId,
+                                                           lastAppOpen: nil,
+                                                           updatedAt: nil,
+                                                           createdAt: nil,
+                                                           location: locationDictionary,
+                                                           language: nil,
+                                                           sdkVersion: sdkVersion,
+                                                           sound: self.pushSound,
+                                                           noNotification: self.noNotification)
+            print("Device Pushed")
+            return self.restClient!.postPushDevice(resourceClass: XMMPushDevice.self, resourceId: token!, parameters: nil, headers: self.httpHeadersWithEphemeralId(), device: device, completion: { (responce, error) in
+                
+                if let error = error {
+                    print("Push device error: \(error.localizedDescription)")
+                    userDefault.set(0.0, forKey: self.kLastPushRegisterKey)
+                    userDefault.synchronize()
+                }
+            })
+            
+            
+        }
+        return nil
     }
     
     
