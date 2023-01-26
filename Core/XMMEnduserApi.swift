@@ -737,6 +737,11 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - push device
     
+    public func pushDevice(instantPush: Bool) -> URLSessionDataTask {
+        
+        let lastPush = self.getUserDefaults().double(forKey: self.kLastPushRegisterKey)
+    }
+    
     
     
     
