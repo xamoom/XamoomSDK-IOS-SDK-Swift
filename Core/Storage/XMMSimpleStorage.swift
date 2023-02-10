@@ -18,7 +18,6 @@ class XMMSimpleStorage {
     
     func saveTags(tags: [String]) {
         self.userDefault.set(tags, forKey: "com.xamoom.ios.offlineTags")
-        self.userDefault.synchronize()
     }
     
     func readTags() -> [String] {
@@ -28,7 +27,6 @@ class XMMSimpleStorage {
     
     func saveLocation(location: [String: String]) {
         self.userDefault.set(location, forKey: "com.xamoom.ios.location")
-        self.userDefault.synchronize()
     }
     
     func getLocation() -> CLLocation? {
@@ -46,7 +44,6 @@ class XMMSimpleStorage {
     
     func saveUserToken(token: String) {
         self.userDefault.set(token, forKey: "com.xamoom.ios.userToken")
-        self.userDefault.synchronize()
     }
     
     func getUserToken() -> String? {

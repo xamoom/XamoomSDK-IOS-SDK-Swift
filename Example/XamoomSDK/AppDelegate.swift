@@ -1,9 +1,8 @@
 //
-//  AppDelegate.swift
-//  XamoomSDK
+//  XMMEnduserApi.swift
+//  XamoomSDKExamle
 //
-//  Created by IvanMagda-energ on 01/17/2023.
-//  Copyright (c) 2023 IvanMagda-energ. All rights reserved.
+//  Created by Vladislav Cherednichenko on 10.01.2023.
 //
 
 import UIKit

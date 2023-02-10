@@ -1,9 +1,8 @@
 //
-//  ViewController.swift
-//  XamoomSDK
+//  XMMEnduserApi.swift
+//  XamoomSDKExamle
 //
-//  Created by IvanMagda-energ on 01/17/2023.
-//  Copyright (c) 2023 IvanMagda-energ. All rights reserved.
+//  Created by Vladislav Cherednichenko on 10.01.2023.
 //
 
 import UIKit
@@ -18,16 +17,24 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         api = XMMEnduserApi(apiKey: getApiKey())
 //        contentWithID()
-        contentWithLocationIdentifier()
+        contentWithTags()
+//        contentWithLocationIdentifier()
     }
     
     private func contentWithID() {
-        api!.contentWithId(contentId: "709", password: nil, completion: { (XMMContent, error, passwordRequired) in
+        api!.content(WithId: "709", password: nil, completion: { (XMMContent, error, passwordRequired) in
+        })
+    }
+    
+    private func contentWithTags() {
+        var sort = XMMContentSortOptions.title
+        api?.contents(WithTags: ["x-row-1"], pageSize: 10, cursor: nil, sortOptions: sort, completion: { (content, hasMore, cursor, error) in
+            
         })
     }
     
     private func contentWithLocationIdentifier() {
-        api?.contentWithLocationIdentifier(locationIdentifier: "b5v2p", options: XMMContentOptions.init(rawValue: 0), password: nil, completion: { (XMMContent, error, passwordRequired) in
+        api?.content(WithLocationIdentifier: "b5v2p", options: XMMContentOptions.init(rawValue: 0), password: nil, completion: { (XMMContent, error, passwordRequired) in
             
         })
     }

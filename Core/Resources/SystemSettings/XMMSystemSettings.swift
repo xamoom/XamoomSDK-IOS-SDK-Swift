@@ -1,8 +1,8 @@
 //
-//  File.swift
-//  XamoomSDK
+//  XMMEnduserApi.swift
+//  XamoomSDKExamle
 //
-//  Created by Иван Магда on 26.01.2023.
+//  Created by Vladislav Cherednichenko on 10.01.2023.
 //
 
 import Foundation

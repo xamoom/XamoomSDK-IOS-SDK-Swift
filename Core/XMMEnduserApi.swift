@@ -71,11 +71,11 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     // MARK: - CONTENT CALLS
     // MARK: - content with id
     
-    public func contentWithId(contentId: String,
+    public func content(WithId contentId: String,
                        password: String?,
                        completion: @escaping(_ content: XMMContent?, _ error: Error?, _ passwordRequired: Bool ) -> Void) -> URLSessionDataTask? {
         
-        return contentWithId(contentId: contentId,
+        return content(WithId: contentId,
                              options: XMMContentOptions(rawValue: 0),
                              reason: XMMContentReason(rawValue: 0)!,
                              password: password,
@@ -83,12 +83,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func contentWithId(contentId: String,
+    public func content(WithId contentId: String,
                        options: XMMContentOptions,
                        password: String?,
                        completion: @escaping(_ content: XMMContent?, _ error: Error?, _ passwordRequired: Bool ) -> Void) -> URLSessionDataTask? {
         
-        return contentWithId(contentId: contentId,
+        return content(WithId: contentId,
                              options: options,
                              reason: XMMContentReason(rawValue: 0)!,
                              password: password,
@@ -96,7 +96,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func contentWithId(contentId: String,
+    public func content(WithId contentId: String,
                        options: XMMContentOptions,
                        reason: XMMContentReason,
                        password: String?,
@@ -114,7 +114,6 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             var passwordEnters = userDefaults.integer(forKey: contentId)
             passwordEnters += 1
             userDefaults.set(passwordEnters, forKey: contentId)
-            userDefaults.synchronize()
             userDefaults.set(password, forKey: "X-Password")
         }
         
@@ -122,29 +121,67 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                                         resourceId: contentId,
                                         headers: headers,
                                         parameters: params,
-                                        completion: { (data, error) in
+                                              completion: { [self] (data, error) in
+            if let error = error {
+                
+                switch error {
+                case XMMRestClient.ApiError.statusCode(401):
+                    if self.shouldShowPassword(ForContentId: contentId, pasword: password!, error: error, completion: completion) {
+                        completion(nil, error, true)
+                        return
+                    }
+                    return
+                    
+                case XMMRestClient.ApiError.statusCode(404):
+                    self.contents(WithTags: ["x-forbidden"], pageSize: 10, cursor: nil, sortOptions: nil) { (contents, hasMore, cursor, error) in
+                        
+                        if let error {
+                            completion(nil, error, false)
+                            return
+                        }
+                        if contents.first != nil {
+                            completion(contents.first as? XMMContent, nil, false)
+                            return
+                        }
+                    }
+                    return
+                default:
+                    self.userDefaults?.setValue(0, forKey: contentId)
+                    completion(nil, error, false)
+                    return
+                }
+            }
+            let decoder = JSONDecoder()
+            do {
+                let model = try decoder.decode(ContentResponse.self, from: data!)
+                let content = XMMContent(model)
+                completion(content, error, false)
+                
+            } catch let error {
+                
+            }
         })
     }
     
     // MARK: - content with location identifier
     
-    public func contentWithLocationIdentifier(locationIdentifier: String,
+    public func content(WithLocationIdentifier locationIdentifier: String,
                                               password: String?,
                                               completion: @escaping(_ content: XMMContent, _ error: Error, _ passwordRequired: Bool) -> Void) -> URLSessionDataTask {
         
-        return contentWithLocationIdentifier(locationIdentifier: locationIdentifier,
+        return content(WithLocationIdentifier: locationIdentifier,
                                              options: XMMContentOptions(rawValue: 0),
                                              password: password,
                                              completion: completion)
     }
     
     
-    public func contentWithLocationIdentifier(locationIdentifier: String,
+    public func content(WithLocationIdentifier locationIdentifier: String,
                                               options: XMMContentOptions,
                                               password: String?,
                                               completion: @escaping(_ content: XMMContent, _ error: Error, _ passwordRequired: Bool) -> Void) -> URLSessionDataTask {
         
-        return contentWithLocationIdentifier(locationIdentifier: locationIdentifier,
+        return content(WithLocationIdentifier: locationIdentifier,
                                              options: options,
                                              conditions: nil,
                                              password: password,
@@ -152,20 +189,20 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func contentWithLocationIdentifier(locationIdentifier: String,
+    public func content(WithLocationIdentifier locationIdentifier: String,
                                               options: XMMContentOptions,
                                               conditions: [String: String]?,
                                               password: String?,
                                               completion: @escaping(_ content: XMMContent, _ error: Error, _ passwordRequired: Bool) -> Void) -> URLSessionDataTask {
         
-        return contentWithLocationIdentifier(locationIdentifier: locationIdentifier,
+        return content(WithLocationIdentifier: locationIdentifier,
                                              options: options,
                                              conditions: conditions ?? nil,
                                              reason: XMMContentReason(rawValue: 0)!, password: password, completion: completion)
     }
     
     
-    public func contentWithLocationIdentifier(locationIdentifier: String,
+    public func content(WithLocationIdentifier locationIdentifier: String,
                                               options: XMMContentOptions,
                                               conditions: [String: String]?,
                                               reason: XMMContentReason,
@@ -192,7 +229,6 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             var passwordEnters = userDefault.integer(forKey: locationIdentifier)
             passwordEnters += 1
             userDefault.set(passwordEnters, forKey: locationIdentifier)
-            userDefault.synchronize()
             headers["X-Password"] = password
         }
         return self.restClient!.fetchResource(resourceClass: XMMContent.self,
@@ -209,34 +245,34 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                                        completion: @escaping(_ content: XMMContent, _ error: Error, _ passwordRequired: Bool) -> Void) -> URLSessionDataTask{
         let locationIdentifire = "\(major)|\(minor)"
         
-        return self.contentWithLocationIdentifier(locationIdentifier: locationIdentifire,
+        return content(WithLocationIdentifier: locationIdentifire,
                                                   password: nil,
                                                   completion: completion)
     }
     
     
      
-    public func contentWithBeaconMajor(major: Int,
+    public func content(WithBeaconMajor major: Int,
                                        minor: Int,
                                        option: XMMContentOptions,
                                        completion: @escaping(_ content: XMMContent, _ error: Error, _ passwordRequired: Bool) -> Void) -> URLSessionDataTask{
         let locationIdentifire = "\(major)|\(minor)"
         
-        return self.contentWithLocationIdentifier(locationIdentifier: locationIdentifire,
+        return content(WithLocationIdentifier: locationIdentifire,
                                                   options: option,
                                                   password: nil,
                                                   completion: completion)
     }
     
     
-    public func contentWithBeaconMajor(major: Int,
+    public func content(WithBeaconMajor major: Int,
                                        minor: Int,
                                        option: XMMContentOptions,
                                        conditions: [String: String]?,
                                        completion: @escaping(_ content: XMMContent, _ error: Error, _ passwordRequired: Bool) -> Void) -> URLSessionDataTask{
         let locationIdentifire = "\(major)|\(minor)"
         
-        return self.contentWithLocationIdentifier(locationIdentifier: locationIdentifire,
+        return content(WithLocationIdentifier: locationIdentifire,
                                                   options: option,
                                                   conditions: conditions ?? nil,
                                                   password: nil,
@@ -244,7 +280,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func contentWithBeaconMajor(major: Int,
+    public func content(WithBeaconMajor major: Int,
                                        minor: Int,
                                        option: XMMContentOptions,
                                        conditions: [String: String]?,
@@ -252,7 +288,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                                        completion: @escaping(_ content: XMMContent, _ error: Error, _ passwordRequired: Bool) -> Void) -> URLSessionDataTask{
         let locationIdentifire = "\(major)|\(minor)"
         
-        return self.contentWithLocationIdentifier(locationIdentifier: locationIdentifire,
+        return content(WithLocationIdentifier: locationIdentifire,
                                                   options: option,
                                                   conditions: conditions ?? nil,
                                                   reason: reason,
@@ -262,7 +298,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - content with location
     
-    public func contentsWithLocation(location: CLLocation,
+    public func content(sWithLocation location: CLLocation,
                                      pageSize: Int,
                                      cursor: String,
                                      sortOptions: XMMContentSortOptions,
@@ -271,7 +307,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
         params = XMMParamHelper.addContentSortOptionsToParams(params: params, options: sortOptions)
         
-        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
+        return restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: self.httpHeadersWithEphemeralId(),
                                              parameters: params,
                                              completion: { (data, error) in
@@ -281,13 +317,13 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - content with tags
     
-    public func contentsWithTags(tags: [String],
+    public func contents(WithTags tags: [String],
                                  pageSize: Int,
-                                 cursor: String,
-                                 sortOptions: XMMContentSortOptions,
-                                 completion: @escaping(_ contents: [Any], _ hasMore: Bool, _ cursor: String, _ error: Error) -> Void) -> URLSessionDataTask {
+                                 cursor: String?,
+                                 sortOptions: XMMContentSortOptions?,
+                                 completion: @escaping(_ contents: [Any], _ hasMore: Bool, _ cursor: String, _ error: Error?) -> Void) -> URLSessionDataTask {
         
-        return self.contentsWithTags(tags: tags,
+        return self.contents(WithTags: tags,
                                      pageSize: pageSize,
                                      cursor: cursor,
                                      sortOptions: sortOptions,
@@ -296,10 +332,10 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func contentsWithTags(tags: [String],
+    public func contents(WithTags tags: [String],
                                  pageSize: Int,
-                                 cursor: String,
-                                 sortOptions: XMMContentSortOptions,
+                                 cursor: String?,
+                                 sortOptions: XMMContentSortOptions?,
                                  filter: XMMFilter?,
                                  completion: @escaping(_ contents: [Any], _ hasMore: Bool, _ cursor: String, _ error: Error) -> Void) -> URLSessionDataTask {
         
@@ -313,7 +349,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         params = XMMParamHelper.addFiltersToParams(params: params, filters: filter)
         params = XMMParamHelper.addPagingToParams(params: params, pageSize: pageSize, cursor: cursor)
-        params = XMMParamHelper.addContentSortOptionsToParams(params: params, options: sortOptions)
+        params = XMMParamHelper.addContentSortOptionsToParams(params: params, options: sortOptions!)
         
         return self.restClient!.fetchResource(resourceClass: XMMContent.self,
                                              headers: self.httpHeadersWithEphemeralId(),
@@ -324,13 +360,13 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - content with name
     
-    public func contentsWithName(name: String,
+    public func contents(WithName name: String,
                                  pageSize: Int,
                                  cursor: String,
                                  sortOptions: XMMContentSortOptions,
                                  completion: @escaping(_ contents: [Any], _ hasMore: Bool, _ cursor: String, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        return self.contentsWithName(name: name,
+        return contents(WithName: name,
                                      pageSize: pageSize,
                                      cursor: cursor,
                                      sortOptions: sortOptions,
@@ -339,7 +375,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func contentsWithName(name: String,
+    public func contents(WithName name: String,
                                  pageSize: Int,
                                  cursor: String,
                                  sortOptions: XMMContentSortOptions,
@@ -367,7 +403,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - content with date
     
-    public func contentsFrom(fromeDate: Date,
+    public func contents(From fromeDate: Date,
                              toDate: Date,
                              relatedSpotID: String,
                              pageSize: Int,
@@ -400,7 +436,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - Content recomendation
     
-    public func contentRecommendationsWithCompletion(completion: @escaping( _ contents: [Any]?, _ hasMore: Bool, _ cursor: String?, _ error: NSError?) -> Void) -> URLSessionDataTask? {
+    public func contentRecommendations(WithCompletion completion: @escaping( _ contents: [Any]?, _ hasMore: Bool, _ cursor: String?, _ error: NSError?) -> Void) -> URLSessionDataTask? {
         
         if self.getEphemeralId() == "" {
             print("Content Recommendations not available without ephemeral id, please first call backend another way.")
@@ -440,15 +476,15 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     // MARK: - SPOT CALLS
     // MARK: - spot with ID
     
-    public func spotWithId(spotId: String,
+    public func spot(WithId spotId: String,
                            completion: @escaping( _ spot: XMMSpot?, _ error: Error?) -> Void) -> URLSessionDataTask {
-        return self.spotWithId(spotId: spotId,
+        return self.spot(WithId: spotId,
                                options: .XMMSpotOptionsNone,
                                completion: completion)
     }
     
     
-    public func spotWithId(spotId: String,
+    public func spot(WithId spotId: String,
                            options: XMMSpotOptions,
                            completion: @escaping( _ spot: XMMSpot?, _ error: Error?) -> Void) -> URLSessionDataTask {
         var params = XMMParamHelper.paramsWithLanguage(language: self.language!)
@@ -471,13 +507,13 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - spot with location
     
-    public func spotWithLocation(location: CLLocation,
+    public func spot(WithLocation location: CLLocation,
                                  radius: Int,
                                  options: XMMSpotOptions,
                                  sortOptions: XMMSpotSortOptions,
                                  completion: @escaping( _ spot: [Any]?, _ hasMore: Bool, _ cursor: String?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        return self.spotWithLocation(location: location,
+        return self.spot(WithLocation: location,
                                      radius: radius,
                                      options: options,
                                      sortOptions: sortOptions,
@@ -487,7 +523,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func spotWithLocation(location: CLLocation,
+    public func spot(WithLocation location: CLLocation,
                                  radius: Int,
                                  options: XMMSpotOptions,
                                  sortOptions: XMMSpotSortOptions,
@@ -515,12 +551,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - spot with tags
     
-    public func spotsWithTags(tags: [String],
+    public func spots(WithTags tags: [String],
                               options: XMMSpotOptions,
                               sortOptions: XMMSpotSortOptions,
                               completion: @escaping(_ spots: [Any]?, _ hasMore: Bool, _ cursor: String?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        return self.spotsWithTags(tags: tags,
+        return self.spots(WithTags: tags,
                                   pageSize: 100,
                                   cursor: nil,
                                   options: options,
@@ -529,7 +565,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     }
     
     
-    public func spotsWithTags(tags: [String],
+    public func spots(WithTags tags: [String],
                               pageSize: Int,
                               cursor: String?,
                               options: XMMSpotOptions,
@@ -561,7 +597,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - spot with name
     
-    public func spotsWithName(name: String,
+    public func spots(WithName name: String,
                               pageSize: Int,
                               cursor: String,
                               options: XMMSpotOptions,
@@ -594,7 +630,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     // MARK: - SYSTEM CALLS
     // MARK: - system with completion
     
-    public func systemWithCompletion(completion: @escaping(_ system: XMMSystem?, _ error: Error) -> Void) -> URLSessionDataTask {
+    public func system(WithCompletion completion: @escaping(_ system: XMMSystem?, _ error: Error) -> Void) -> URLSessionDataTask {
         
         let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
         
@@ -615,7 +651,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - system settings with id
     
-    public func systemSettingsWithID(settingsId: String,
+    public func system(SettingsWithID settingsId: String,
                                      completion: @escaping(_ settings: XMMSystemSettings?, _ error: Error) -> Void) -> URLSessionDataTask {
         
         let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
@@ -638,7 +674,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - style with id
     
-    public func styleWithID(styleId: String,
+    public func style(WithID styleId: String,
                             completion: @escaping(_ style: XMMStyle?, _ error: Error) -> Void) -> URLSessionDataTask {
         
         let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
@@ -661,7 +697,7 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - menu with id
     
-    public func menuWithID(menuId: String,
+    public func menu(WithID menuId: String,
                             completion: @escaping(_ menu: XMMMenu?, _ error: Error) -> Void) -> URLSessionDataTask {
         
         let params = XMMParamHelper.paramsWithLanguage(language: self.language!)
@@ -684,10 +720,10 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - voucher status with id
     
-    public func voucherStatusWithContendID(contentId: String,
+    public func voucherStatus(WithContendID contentId: String,
                                            clientId: String?, completion: @escaping(_ isRedeemable: Bool?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        return self.restClient!.voucherStatusWithContentID(contentId: contentId,
+        return self.restClient!.voucherStatus(WithContentID: contentId,
                                                           clientID: clientId ?? self.getEphemeralId(),
                                                           headers: self.httpHeadersWithEphemeralId(),
                                                           completion: { (data, error) in
@@ -704,12 +740,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     
     // MARK: - redeem voucher with id
     
-    public func redeemVoucherWithContendID(contentId: String,
+    public func redeemVoucher(WithContendID contentId: String,
                                            clientId: String?,
                                            readeemCode: String,
                                            completion: @escaping(_ isRedeemable: Bool?, _ error: Error) -> Void) -> URLSessionDataTask {
         
-        return self.restClient!.redeemVoucherWithContentID(contentId: contentId,
+        return self.restClient!.redeemVoucher(WithContentID: contentId,
                                                           clientID: clientId ?? self.getEphemeralId(),
                                                           redeemCode: readeemCode,
                                                           headers: self.httpHeadersWithEphemeralId(),
@@ -767,7 +803,6 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             
             let now = Date().timeIntervalSince1970
             userDefault.set(now, forKey: kLastPushRegisterKey)
-            userDefault.synchronize()
             
             let device = XMMPushDevice.XMMPushDeviceObject(uid: token,
                                                            os: nil,
@@ -787,7 +822,6 @@ public class XMMEnduserApi: XMMRestClientDelegate {
                 if let error = error {
                     print("Push device error: \(error.localizedDescription)")
                     userDefault.set(0.0, forKey: self.kLastPushRegisterKey)
-                    userDefault.synchronize()
                 }
             })
             
@@ -810,7 +844,6 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             self.ephemeralId = ephemeralId
             let userDefaults = getUserDefaults()
             userDefaults.string(forKey: kEphemeralIdKey)
-            userDefaults.synchronize()
         }
     }
     
@@ -819,7 +852,6 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             self.authorizationId = authorizationId
             let userDefaults = getUserDefaults()
             userDefaults.string(forKey: kAuthorizationKey)
-            userDefaults.synchronize()
         }
     }
     
@@ -899,5 +931,135 @@ public class XMMEnduserApi: XMMRestClientDelegate {
         }
         let customUserAgent = "\(kHTTPUserAgent)|\(appName)-\(appVersion ?? "")|\(sdkVersion ?? "")"
         return customUserAgent
+    }
+    
+    func setPushSound(s: Bool) {
+        let userDefaults = self.getUserDefaults()
+        userDefaults.set(s, forKey: "pushSound")
+    }
+    
+    func getPushSound() -> Bool {
+        let userDefault = self.getUserDefaults()
+        let sound = userDefault.bool(forKey: "pushSound")
+        return sound
+    }
+    
+    func setNoNotification(noNotification: Bool) {
+        let userDefaults = getUserDefaults()
+        userDefaults.set(noNotification, forKey: "noNotification")
+    }
+    
+    func getNoNotification() -> Bool {
+        let userDefault = self.getUserDefaults()
+        let notification = userDefault.bool(forKey: "noNotification")
+        return notification
+    }
+    
+    func shouldShowPassword(ForContentId contentId: String, pasword: String, error: Error, completion: @escaping(XMMContent?, Error?, _ paswowordReguired: Bool) -> Void) -> Bool {
+        
+        let nextPasswordKey = "next_\(contentId)"
+        let userDefault = getUserDefaults()
+        
+        let passwordEnters = userDefault.integer(forKey: contentId)
+        let lastDate = userDefault.object(forKey: nextPasswordKey) as? Date
+        
+        if let lastDate {
+            let now = Date()
+            let earliestOpenDate = lastDate.addingTimeInterval(15 * 60)
+            if earliestOpenDate.compare(now) == .orderedDescending {
+                contents(WithTags: ["x-forbidden"], pageSize: 10, cursor: nil, sortOptions: nil) { contents, hasMore, cursor, error in
+                    
+                    if let error {
+                        completion(nil, error, false)
+                        return
+                    }
+                    if contents.first != nil {
+                        completion(contents.first as? XMMContent, nil, false)
+                        return
+                    } else {
+                        completion(nil, error, false)
+                        return
+                    }
+                }
+                return false
+            }
+        }
+        if (passwordEnters < 3) {
+            return true
+            
+        } else {
+            let now = Date()
+            userDefault.setValue(now, forKey: nextPasswordKey)
+            userDefault.setValue(0, forKey: contentId)
+            contents(WithTags: ["x-forbidden"], pageSize: 10, cursor: nil, sortOptions: nil) { contents, hasMore, cursor, error in
+                
+                if let error {
+                    completion(nil, error, false)
+                    return
+                }
+                if contents.first != nil {
+                    completion(contents.first as? XMMContent, nil, false)
+                    return
+                } else {
+                    completion(nil, error, false)
+                    return
+                }
+            }
+            return false
+        }
+    }
+    
+    func shouldShowPassword(ForLocId locationIdentifier: String, pasword: String, error: Error, completion: @escaping(XMMContent?, Error?, _ paswowordReguired: Bool) -> Void) -> Bool {
+        
+        let nextPasswordKey = "next_\(locationIdentifier)"
+        let userDefault = getUserDefaults()
+        
+        let passwordEnters = userDefault.integer(forKey: locationIdentifier)
+        let lastDate = userDefault.object(forKey: nextPasswordKey) as? Date
+        
+        if let lastDate {
+            let now = Date()
+            let earliestOpenDate = lastDate.addingTimeInterval(15 * 60)
+            if earliestOpenDate.compare(now) == .orderedDescending {
+                contents(WithTags: ["x-forbidden"], pageSize: 10, cursor: nil, sortOptions: nil) { contents, hasMore, cursor, error in
+                    
+                    if let error {
+                        completion(nil, error, false)
+                        return
+                    }
+                    if contents.first != nil {
+                        completion(contents.first as? XMMContent, nil, false)
+                        return
+                    } else {
+                        completion(nil, error, false)
+                        return
+                    }
+                }
+                return false
+            }
+        }
+        if (passwordEnters < 3) {
+            return true
+            
+        } else {
+            let now = Date()
+            userDefault.setValue(now, forKey: nextPasswordKey)
+            userDefault.setValue(0, forKey: locationIdentifier)
+            contents(WithTags: ["x-forbidden"], pageSize: 10, cursor: nil, sortOptions: nil) { contents, hasMore, cursor, error in
+                
+                if let error {
+                    completion(nil, error, false)
+                    return
+                }
+                if contents.first != nil {
+                    completion(contents.first as? XMMContent, nil, false)
+                    return
+                } else {
+                    completion(nil, error, false)
+                    return
+                }
+            }
+            return false
+        }
     }
 }

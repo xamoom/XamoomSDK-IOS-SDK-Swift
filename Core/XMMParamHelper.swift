@@ -94,7 +94,7 @@ class XMMParamHelper {
                                               options: XMMContentSortOptions) -> [String: String] {
         var mutableParams = params
         
-        if options.contains(.XMMContentSortOptionsNone) == false {
+        if options.contains(.none) == false {
             let sortParameter = contentSortOptionsToArray(sortOptions: options)
             mutableParams["sort"] = sortParameter.joined(separator: ",")
         }
@@ -117,7 +117,7 @@ class XMMParamHelper {
                                               options: XMMSpotSortOptions) -> [String: String] {
         var mutableParams = params
         
-        if options.contains(.XMMSpotSortOptionsNone) == false {
+        if options.contains(.none) == false {
             let sortParameter = spotSortOptionsToArray(sortOption: options)
             mutableParams["sort"] = sortParameter.joined(separator: ",")
         }
@@ -141,22 +141,22 @@ class XMMParamHelper {
     static func contentSortOptionsToArray(sortOptions: XMMContentSortOptions) -> [String] {
         var sortParameters: [String] = []
         
-        if sortOptions.contains(.XMMContentSortOptionsTitle) {
+        if sortOptions.contains(.title) {
             sortParameters.append("name")
         }
-        if sortOptions.contains(.XMMContentSortOptionsTitleDesc) {
+        if sortOptions.contains(.titleDesc) {
             sortParameters.append("-name")
         }
-        if sortOptions.contains(.XMMContentSortOptionsFromDate) {
+        if sortOptions.contains(.fromDate) {
             sortParameters.append("meta-datetime-from")
         }
-        if sortOptions.contains(.XMMContentSortOptionsFromDateDesc) {
+        if sortOptions.contains(.fromDateDesc) {
             sortParameters.append("-meta-datetime-from")
         }
-        if sortOptions.contains(.XMMContentSortOptionsToDate) {
+        if sortOptions.contains(.toDate) {
             sortParameters.append("meta-datetime-to")
         }
-        if sortOptions.contains(.XMMContentSortOptionsToDateDesc) {
+        if sortOptions.contains(.toDateDesc) {
             sortParameters.append("-meta-datetime-to")
         }
         return sortParameters
@@ -179,16 +179,16 @@ class XMMParamHelper {
     
     static func spotSortOptionsToArray(sortOption: XMMSpotSortOptions) -> [String] {
         var sortParameters: [String] = []
-        if sortOption.contains(.XMMSpotSortOptionsName) {
+        if sortOption.contains(.name) {
             sortParameters.append("name")
         }
-        if sortOption.contains(.XMMSpotSortOptionsNameDesc) {
+        if sortOption.contains(.nameDesc) {
             sortParameters.append("-name")
         }
-        if sortOption.contains(.XMMSpotSortOptionsDistance) {
+        if sortOption.contains(.distance) {
             sortParameters.append("distance")
         }
-        if sortOption.contains(.XMMSpotSortOptionsDistanceDesc) {
+        if sortOption.contains(.distanceDesc) {
             sortParameters.append("-distance")
         }
         return sortParameters

@@ -21,6 +21,11 @@ class XMMRestClient {
         self.session = session
     }
     
+    enum ApiError: Error {
+        case invalidResponse
+        case statusCode(Int)
+    }
+    
     func fetchResource(resourceClass: Any,
                        headers: [String: String],
                        completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
@@ -53,7 +58,7 @@ class XMMRestClient {
                             complition: completion)
     }
     
-    func voucherStatusWithContentID(contentId: String,
+    func voucherStatus(WithContentID contentId: String,
                                     clientID: String,
                                     headers: [String: String],
                                     completion: @escaping(Data?, Error?) -> Void) -> URLSessionDataTask {
@@ -69,7 +74,7 @@ class XMMRestClient {
                             complition: completion)
     }
     
-    func redeemVoucherWithContentID(contentId: String,
+    func redeemVoucher(WithContentID contentId: String,
                                     clientID: String,
                                     redeemCode: String,
                                     headers: [String: String],
@@ -140,16 +145,20 @@ class XMMRestClient {
         let task = session!.dataTask(with: request) { (data, response, error) in
             
             if let error = error {
-                print("Make rest call method error:\(error.localizedDescription)")
-                complition(nil, error)
-            } else if let data = data,
-                      let response = response as? HTTPURLResponse,
-                      response.statusCode == 200 {
-                
-                self.checkHeaders(headers: response)
-                complition(data, nil)
+                print("Fail in rest call with error \(error)")
+                complition(nil, nil)
             }
+            guard let resp = response as? HTTPURLResponse else {
+                complition (nil, ApiError.invalidResponse)
+                return
+            }
+            guard case (200..<300).contains(resp.statusCode) = true else {
+                complition (nil, ApiError.statusCode(resp.statusCode))
+                return
+            }
+            complition (data, nil)
         }
+            
         task.resume()
         return task
     }
