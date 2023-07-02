@@ -16,8 +16,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         api = XMMEnduserApi(apiKey: getApiKey())
-//        contentWithID()
-        contentWithTags()
+        contentWithID()
+//        contentWithTags()
 //        contentWithLocationIdentifier()
     }
     

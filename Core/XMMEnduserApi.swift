@@ -36,6 +36,21 @@ public class XMMEnduserApi: XMMRestClientDelegate {
     var lastLocation: CLLocation?
     var apiUrl: String?
     
+    // MARK: - sharedInstance
+    
+    static var sharedInstance: XMMEnduserApi?
+    static func sharedInstance(with apiKey: String) -> XMMEnduserApi {
+        assert(apiKey.isEmpty == false, "apikey is nil. Please use an apikey")
+        if sharedInstance == nil {
+            sharedInstance = XMMEnduserApi(apiKey: apiKey)
+        }
+        return sharedInstance!
+    }
+    
+    static func saveSharedInstance(_ instance: XMMEnduserApi) {
+        sharedInstance = instance
+    }
+    
     // MARK: - init
     
    public convenience init(apiKey: String) {
@@ -117,11 +132,11 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             userDefaults.set(password, forKey: "X-Password")
         }
         
-        return self.restClient!.fetchResource(resourceClass: XMMContent.self,
+        return restClient!.fetchResource(resourceClass: XMMContent.self,
                                         resourceId: contentId,
                                         headers: headers,
                                         parameters: params,
-                                              completion: { [self] (data, error) in
+                                              completion: { (data, error) in
             if let error = error {
                 
                 switch error {
@@ -154,11 +169,12 @@ public class XMMEnduserApi: XMMRestClientDelegate {
             let decoder = JSONDecoder()
             do {
                 let model = try decoder.decode(ContentResponse.self, from: data!)
+                print (model)
                 let content = XMMContent(model)
                 completion(content, error, false)
                 
             } catch let error {
-                
+                print(error)
             }
         })
     }

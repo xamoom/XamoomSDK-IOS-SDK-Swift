@@ -9,9 +9,9 @@ import Foundation
 
 
 struct ContentResponse : Codable {
-    let data : [ContentData]?
+    let data : ContentData?
     let included : [ContentIncluded]?
-    let meta : ContentMeta?
+//    let meta : ContentMeta?
 }
 
 

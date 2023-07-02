@@ -7,10 +7,18 @@
 
 import Foundation
 
-public struct XMMMenu: XMMRestResource, Codable {
+/**
+ * XMMMenu with the menuItems.
+ */
+
+public class XMMMenu: XMMRestResource {
     
     static var resourceName: String {
         return "consumer/menus"
     }
+    
+    // MARK: - Properties
+    
+    var items: [Any]?
     
 }

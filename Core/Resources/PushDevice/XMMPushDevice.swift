@@ -13,18 +13,18 @@ public class XMMPushDevice: XMMRestResource {
         return "customer/push-register"
     }
     
-    struct XMMPushDeviceObject: Codable {
-        let uid: String?
-        let os: String?
-        let appVersion: String?
-        let appId: String?
-        let lastAppOpen: String?
-        let updatedAt: String?
-        let createdAt: String?
-        let location: [String: Double]?
-        let language: String?
-        let sdkVersion: String?
-        let sound: Bool?
-        let noNotification: Bool?
-    }
+    // MARK: - Properties
+    
+    var uid: String?
+    var os: String?
+    var appVersion: String?
+    var appId: String?
+    var lastAppOpen: String?
+    var updatedAt: String?
+    var createdAt: String?
+    var location: [String: Double]?
+    var language: String?
+    var sdkVersion: String?
+    var sound: Bool?
+    var noNotification: Bool?
 }

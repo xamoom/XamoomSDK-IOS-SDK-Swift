@@ -7,9 +7,22 @@
 
 import Foundation
 
-public struct XMMStyle: XMMRestResource, Codable {
+/**
+ * XMMStyle with colors and icons.
+ */
+
+public class XMMStyle: XMMRestResource {
     
    static var resourceName: String {
         return "consumer/styles"
     }
+    
+    //MARK: - Properties
+    
+    var backgroundColor: String?
+    var highlightFontColor: String?
+    var foregroundFontColor: String?
+    var chromeHeaderColor: String?
+    var customMarker: String?
+    var icon: String?
 }
